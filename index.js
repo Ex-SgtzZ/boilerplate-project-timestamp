@@ -1,6 +1,51 @@
 // index.js
 // where your node app starts
+const express = require("express");
+const app = express();
 
+// REQUIRED for FCC
+app.use(express.static("public"));
+
+// ROOT (must NOT be FCC example page)
+app.get("/", (req, res) => {
+  res.send("Timestamp Microservice");
+});
+
+// 🔥 API ROUTE (THIS IS WHAT FCC TESTS)
+app.get("/api/:date?", (req, res) => {
+  const dateParam = req.params.date;
+
+  let date;
+
+  // Empty → current date
+  if (!dateParam) {
+    date = new Date();
+  }
+  // Unix timestamp (ONLY numbers)
+  else if (/^\d+$/.test(dateParam)) {
+    date = new Date(Number(dateParam));
+  }
+  // Normal date string
+  else {
+    date = new Date(dateParam);
+  }
+
+  // Invalid date
+  if (date.toString() === "Invalid Date") {
+    return res.json({ error: "Invalid Date" });
+  }
+
+  // SUCCESS RESPONSE
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString()
+  });
+});
+
+// PORT (important for deployment)
+const listener = app.listen(process.env.PORT || 3000, () => {
+  console.log("Running on port " + listener.address().port);
+});
 // init project
 var express = require('express');
 var app = express();
