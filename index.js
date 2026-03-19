@@ -1,43 +1,45 @@
 const express = require("express");
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+// FCC requires this exact base project structure
+app.use(express.static("public"));
 
-// Root route (IMPORTANT: not example URL)
+// IMPORTANT: Root must NOT be FCC example
 app.get("/", (req, res) => {
-  res.send("Timestamp Microservice is running.");
+  res.send("My Timestamp Microservice");
 });
 
-// API route
+// 🔥 MAIN API
 app.get("/api/:date?", (req, res) => {
   let dateString = req.params.date;
   let date;
 
-  // If no date provided → current time
+  // 7 & 8: Empty date → current time
   if (!dateString) {
     date = new Date();
   } else {
-    // If it's a Unix timestamp (only numbers)
+    // If numeric → treat as Unix timestamp
     if (/^\d+$/.test(dateString)) {
       date = new Date(parseInt(dateString));
     } else {
+      // Otherwise parse normally
       date = new Date(dateString);
     }
   }
 
-  // Invalid date check
+  // 6: Invalid date
   if (date.toString() === "Invalid Date") {
     return res.json({ error: "Invalid Date" });
   }
 
-  // Return correct format
+  // 2,3,4,5: Correct response format
   res.json({
     unix: date.getTime(),
     utc: date.toUTCString()
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// FCC-compatible port
+const listener = app.listen(process.env.PORT || 3000, () => {
+  console.log("Your app is listening on port " + listener.address().port);
 });
